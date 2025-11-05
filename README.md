@@ -5,9 +5,9 @@ A full-stack MERN marketplace with role-based authentication, Stripe payments, a
 ## 📸 Screenshots
 
 ![admin Dashboard](https://github.com/Sayeed-titan/mern-multivendor-marketplace/blob/main/screenshots/admin-dashboard.JPG)
-![Checkout page](Screenshots/checkout.jpg)
-![Landing page](Screenshots/landing-page.jpg)
-![Shopping cart](Screenshots/shopping-cart.jpg)
+![Checkout page](https://github.com/Sayeed-titan/mern-multivendor-marketplace/blob/main/screenshots/checkout.JPG)
+![Landing page](https://github.com/Sayeed-titan/mern-multivendor-marketplace/blob/main/screenshots/landing-page.JPG)
+![Shopping cart](https://github.com/Sayeed-titan/mern-multivendor-marketplace/blob/main/screenshots/shopping-cart.JPG)
 
 ## ✨ Features
 
