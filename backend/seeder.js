@@ -769,4 +769,159 @@ const seedDatabase = async () => {
       reviewsToCreate.push({
         product: randomProduct._id,
         user: randomCustomer._id,
-        rating: Math.
+        rating: Math.floor(Math.random() * 3) + 3, // Rating between 3-5
+comment: getRandomReview(),
+});
+}
+
+const createdReviews = await Review.insertMany(reviewsToCreate);
+console.log(`✅ ${createdReviews.length} reviews created`);
+
+// Update product ratings based on reviews
+console.log('Updating product ratings...');
+for (const product of createdProducts) {
+  const productReviews = createdReviews.filter(
+    (review) => review.product.toString() === product._id.toString()
+  );
+  
+  if (productReviews.length > 0) {
+    const avgRating =
+      productReviews.reduce((acc, review) => acc + review.rating, 0) /
+      productReviews.length;
+    
+    await Product.findByIdAndUpdate(product._id, {
+      rating: avgRating.toFixed(1),
+      numReviews: productReviews.length,
+    });
+  }
+}
+
+// Create orders
+console.log('Creating orders...');
+const ordersToCreate = [];
+const orderStatuses = ['pending', 'processing', 'shipped', 'delivered'];
+
+for (let i = 0; i < 50; i++) {
+  const randomCustomer = customers[Math.floor(Math.random() * customers.length)];
+  const numItems = Math.floor(Math.random() * 3) + 1; // 1-3 items per order
+  const orderItems = [];
+  
+  for (let j = 0; j < numItems; j++) {
+    const randomProduct = createdProducts[Math.floor(Math.random() * createdProducts.length)];
+    const quantity = Math.floor(Math.random() * 3) + 1;
+    
+    orderItems.push({
+      product: randomProduct._id,
+      vendor: randomProduct.vendor,
+      name: randomProduct.name,
+      quantity,
+      image: randomProduct.images[0].url,
+      price: randomProduct.price,
+    });
+  }
+  
+  const itemsPrice = orderItems.reduce(
+    (acc, item) => acc + item.price * item.quantity,
+    0
+  );
+  const taxPrice = itemsPrice * 0.1;
+  const shippingPrice = 10;
+  const totalPrice = itemsPrice + taxPrice + shippingPrice;
+  
+  const randomStatus = orderStatuses[Math.floor(Math.random() * orderStatuses.length)];
+  const isPaid = randomStatus !== 'pending';
+  
+  ordersToCreate.push({
+    user: randomCustomer._id,
+    orderItems,
+    shippingAddress: randomCustomer.address || {
+      street: '123 Main St',
+      city: 'New York',
+      state: 'NY',
+      zipCode: '10001',
+      country: 'USA',
+    },
+    paymentMethod: 'stripe',
+    paymentResult: isPaid ? {
+      id: `pi_${Math.random().toString(36).substr(2, 9)}`,
+      status: 'succeeded',
+      update_time: new Date().toISOString(),
+      email_address: randomCustomer.email,
+    } : {},
+    itemsPrice: itemsPrice.toFixed(2),
+    taxPrice: taxPrice.toFixed(2),
+    shippingPrice: shippingPrice.toFixed(2),
+    totalPrice: totalPrice.toFixed(2),
+    isPaid,
+    paidAt: isPaid ? new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000) : null,
+    status: randomStatus,
+    isDelivered: randomStatus === 'delivered',
+    deliveredAt: randomStatus === 'delivered' 
+      ? new Date(Date.now() - Math.random() * 15 * 24 * 60 * 60 * 1000) 
+      : null,
+    createdAt: new Date(Date.now() - Math.random() * 60 * 24 * 60 * 60 * 1000), // Last 60 days
+  });
+}
+
+const createdOrders = await Order.insertMany(ordersToCreate);
+console.log(`✅ ${createdOrders.length} orders created`);
+
+console.log('\n🎉 Database seeded successfully!');
+console.log('\n📊 Summary:');
+console.log(`   Users: ${createdUsers.length}`);
+console.log(`   - Admins: 1`);
+console.log(`   - Vendors: ${vendors.length}`);
+console.log(`   - Customers: ${customers.length}`);
+console.log(`   Products: ${createdProducts.length}`);
+console.log(`   Reviews: ${createdReviews.length}`);
+console.log(`   Orders: ${createdOrders.length}`);
+
+console.log('\n🔑 Login Credentials:');
+console.log('   Admin: admin@demo.com / admin123');
+console.log('   Vendor: vendor1@demo.com / vendor123');
+console.log('   Customer: customer1@demo.com / customer123');
+
+process.exit(0);
+} catch (error) {
+console.error('❌ Error seeding database:', error);
+process.exit(1);
+}
+};
+// Helper function to generate random reviews
+function getRandomReview() {
+const reviews = [
+'Excellent product! Exactly as described and arrived quickly.',
+'Great quality for the price. Very satisfied with my purchase.',
+'Good product but took longer to arrive than expected.',
+'Amazing! Would definitely recommend to others.',
+'Decent product, does what its supposed to do.',
+'Love it! Better than I expected from the pictures.',
+'Good value for money. Happy with the quality.',
+'Works perfectly! No complaints at all.',
+'Nice product but packaging could be better.',
+'Fantastic! Exceeded my expectations in every way.',
+'Very pleased with this purchase. Will buy again.',
+'Product is okay, nothing special but functional.',
+'Impressed with the quality and fast shipping.',
+'Exactly what I needed. Highly recommend!',
+'Good product overall. Minor issues but manageable.',
+'Outstanding quality! Worth every penny.',
+'Perfect! Just what I was looking for.',
+'Satisfied with the purchase. Good customer service too.',
+'Nice addition to my collection. Very happy!',
+'Works as advertised. No issues so far.',
+'Great find! The quality is impressive.',
+'Good product but wish it came in more colors.',
+'Excellent! Fast delivery and great packaging.',
+'Very good quality. Looks exactly like the pictures.',
+'Happy with this purchase. Recommend to everyone!',
+'Solid product. Does the job well.',
+'Love the design and functionality!',
+'Good purchase. Met all my expectations.',
+'Fantastic product! Will definitely buy from this seller again.',
+'Pretty good overall. A few minor flaws but still satisfied.',
+];
+return reviews[Math.floor(Math.random() * reviews.length)];
+}
+// Run the seeder
+seedDatabase();
