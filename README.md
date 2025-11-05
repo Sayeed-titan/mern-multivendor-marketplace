@@ -2,6 +2,12 @@
 
 A full-stack MERN marketplace with role-based authentication, Stripe payments, and real-time inventory management.
 
+## 📸 Screenshots
+![admin Dashboard](screenshots/admin-dashboard.jpg)
+![checkout page](screenshots/checkout.jpg)
+![landing page](screenshots/landing-page.jpg)
+![shopping cart](screenshots/shopping-cart.jpg)
+
 ## ✨ Features
 
 - 🔐 JWT Authentication with 3 user roles (Customer, Vendor, Admin)
